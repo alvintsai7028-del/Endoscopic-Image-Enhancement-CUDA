@@ -74,7 +74,7 @@ Through structural algorithmic refactoring, hardware acceleration, and concurren
 | :--- | :--- | :--- | :--- |
 | **Python Prototype (Baseline)** | 3.52 seconds | ~0.28 FPS | Baseline |
 | **Naive C++ Port (Logic Tweaks)** | 1.48 seconds | ~0.68 FPS | 2.38x Acceleration |
-| **CUDA + Multi-Threaded C++** | 0.35 seconds | ~30 FPS | **10.05x Acceleration** |
+| **CUDA + Multi-Threaded C++** | 0.035 seconds | ~28.6 FPS | **100.57x Acceleration** |
 
 ### Core Benchmarks & Key Metrics
 * **Latency Reduction:** Frame processing time for a standard 1280x720 resolution stream dropped from 3.52 seconds to 1.48 seconds after basic C++ logic modifications, and was ultimately minimized to 0.35 seconds through advanced acceleration.

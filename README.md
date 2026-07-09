@@ -47,6 +47,17 @@ graph TD
     I --> J[Alpha-Beta Blending & Contrast Tuning]
     J --> K[Real-Time Video Display / MP4 Output]
 ```
+## Multi-Mode Live Demo & Algorithmic Comparison
+
+The enhancement engine features a dynamic runtime architecture supporting three modular visualization modes. This layout functions as a progressive ablation study, demonstrating the independent visual impact of both spatial-frequency filtering and localized color-space luminance matching.
+
+| Mode 0: Raw Clinical Input | Mode 1: Frequency-Domain Base | Mode 2: Full Heterogeneous Engine |
+| :---: | :---: | :---: |
+| ![Mode 0 Raw](./media/mode0_raw.png) | ![Mode 1 Enhanced](./media/mode1_enhanced.png) | ![Mode 2 V-CLAHE](./media/mode2_vclahe.png) |
+| **Baseline Stream (720x576)** | **DWT + Guided Filter + Laplacian** | **V-Channel CLAHE + Fused Pipeline** |
+| Standard uncompressed camera acquisition suffering from uneven clinical lighting. | Eradicates sensor noise floor while maximizing micro-vessel boundary sharpness. | Maximizes sub-surface tissue contrast without color distortion or artifact clipping. |
+
+
 ## Technical Implementation Details
 
 ### 1. Algorithmic Refactoring & Mathematical Optimization

@@ -53,7 +53,7 @@ The enhancement engine features a dynamic runtime architecture supporting three 
 
 | Mode 0: Raw Clinical Input | Mode 1: RGB-Space CLAHE Engine | Mode 2: Dual-Stage Full Optimization |
 | :---: | :---: | :---: |
-| ![Mode 0 Raw](./media/mode0.jpg) | ![Mode 1 RGB CLAHE](./media/mode1.jpg) | ![Mode 2 Dual Stage](./media/mode2.jpg) |
+| ![Mode 0 Raw](./mode0.jpg) | ![Mode 1 RGB CLAHE](./mode1.jpg) | ![Mode 2 Dual Stage](./mode2.jpg) |
 | **Baseline Stream** | **Multi-Channel RGB CLAHE Pipeline** | **HSV V-Channel + RGB CLAHE Pipeline** |
 | Standard uncompressed camera acquisition with muted sub-surface vascular details and uneven lighting. | Applies multi-threaded CLAHE independently across R, G, and B channels alongside DWT edge-preservation. | Executes an initial pre-processing CLAHE pass on the HSV V-channel before computing multi-channel RGB loops. |
 

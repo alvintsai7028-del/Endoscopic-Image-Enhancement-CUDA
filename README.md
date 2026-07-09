@@ -49,14 +49,13 @@ graph TD
 ```
 ## Multi-Mode Live Demo & Algorithmic Comparison
 
-The enhancement engine features a dynamic runtime architecture supporting three modular visualization modes. This layout functions as a progressive ablation study, demonstrating the independent visual impact of both spatial-frequency filtering and localized color-space luminance matching.
+The enhancement engine features a dynamic runtime architecture supporting three modular visualization modes. This configuration acts as a progressive ablation study, demonstrating the performance variance between standard RGB-space transformation and dual-stage cross-color-space luminance alignment.
 
-| Mode 0: Raw Clinical Input | Mode 1: Frequency-Domain Base | Mode 2: Full Heterogeneous Engine |
+| Mode 0: Raw Clinical Input | Mode 1: RGB-Space CLAHE Engine | Mode 2: Dual-Stage Full Optimization |
 | :---: | :---: | :---: |
-| ![Mode 0 Raw](./media/mode0_raw.png) | ![Mode 1 Enhanced](./media/mode1_enhanced.png) | ![Mode 2 V-CLAHE](./media/mode2_vclahe.png) |
-| **Baseline Stream (720x576)** | **DWT + Guided Filter + Laplacian** | **V-Channel CLAHE + Fused Pipeline** |
-| Standard uncompressed camera acquisition suffering from uneven clinical lighting. | Eradicates sensor noise floor while maximizing micro-vessel boundary sharpness. | Maximizes sub-surface tissue contrast without color distortion or artifact clipping. |
-
+| ![Mode 0 Raw](./media/mode0.jpg) | ![Mode 1 RGB CLAHE](./media/mode1.jpg) | ![Mode 2 Dual Stage](./media/mode2.jpg) |
+| **Baseline Stream** | **Multi-Channel RGB CLAHE Pipeline** | **HSV V-Channel + RGB CLAHE Pipeline** |
+| Standard uncompressed camera acquisition with muted sub-surface vascular details and uneven lighting. | Applies multi-threaded CLAHE independently across R, G, and B channels alongside DWT edge-preservation. | Executes an initial pre-processing CLAHE pass on the HSV V-channel before computing multi-channel RGB loops. |
 
 ## Technical Implementation Details
 

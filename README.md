@@ -54,7 +54,7 @@ The enhancement engine features a dynamic runtime architecture supporting three 
 | Mode 0: Raw Clinical Input | Mode 1: RGB-Space CLAHE Engine | Mode 2: Dual-Stage Full Optimization |
 | :---: | :---: | :---: |
 | ![Mode 0 Raw](./mode0.jpg) | ![Mode 1 RGB CLAHE](./mode1.jpg) | ![Mode 2 Dual Stage](./mode2.jpg) |
-| **Baseline Stream** | **Multi-Channel RGB CLAHE Pipeline** | **HSV V-Channel + RGB CLAHE Pipeline** |
+| **Baseline Stream** | **Multi-Channel RGB CLAHE Pipeline** | **HSV V-Channel + Multi-Channel RGB CLAHE Pipeline** |
 | Standard uncompressed camera acquisition with muted sub-surface vascular details and uneven lighting. | Applies multi-threaded CLAHE independently across R, G, and B channels alongside DWT edge-preservation. | Executes an initial pre-processing CLAHE pass on the HSV V-channel before computing multi-channel RGB loops. |
 
 ## Technical Implementation Details
@@ -72,7 +72,7 @@ The enhancement engine features a dynamic runtime architecture supporting three 
 * **Threaded Acceleration:** Utilizing `std::thread`, three concurrent CPU threads execute image enhancement tasks in parallel, maximizing multi-core processor efficiency and enabling high-throughput streaming.
 
 ### 4. Dynamic Parameter Control & User Interface
-* **Interactive Control Panel:** Designed an updated real-time runtime application that integrates a graphical user interface (UI) with trackbars, allowing operators to dynamically adjust algorithmic parameters on the fly.
+* **Interactive Control Panel:** Interactive Control Panel: Designed an enhanced real-time application featuring an integrated graphical user interface (GUI) with sliders, enabling operators to dynamically adjust algorithm parameters in real time.
 * **Configurable Optimization Pipelines:** Users can interactively tune parameters such as thresholding limits, filter kernels, and visualization modes (e.g., side-by-side comparison or dual-lens stream views).
 * **V-Channel Contrast Enhancement:** Integrated an optional pipeline expansion that applies Contrast Limited Adaptive Histogram Equalization (CLAHE) specifically to the V (Value) channel within the HSV color space for enhanced detail visualization.
 
@@ -87,7 +87,7 @@ Through structural algorithmic refactoring, hardware acceleration, and concurren
 | **CUDA + Multi-Threaded C++** | 0.035 seconds | ~28.6 FPS | **100.57x Acceleration** |
 
 ### Core Benchmarks & Key Metrics
-* **Latency Reduction:** Frame processing time for a standard 1280x720 resolution stream dropped from 3.52 seconds to 1.48 seconds after basic C++ logic modifications, and was ultimately minimized to 0.35 seconds through advanced acceleration.
+* **Latency Reduction:** Frame processing time for a standard 1280x720 resolution stream dropped from 3.52 seconds to 1.48 seconds after basic C++ logic modifications, and was ultimately minimized to 0.035 seconds through advanced acceleration.
 * **Real-Time Throughput:** By shifting critical matrix computations to the GPU and implementing multi-threaded processing while omitting non-essential Super-Resolution overhead, the pipeline maintains a consistent throughput of nearly 30 FPS.
 * **Dynamic Resolution Scalability:** The framework delivers lag-free, real-time processing across various endoscopic instruments by dynamically adjusting the pre-processing magnification scale based on the target camera's input resolution.
 
@@ -105,4 +105,4 @@ Through structural algorithmic refactoring, hardware acceleration, and concurren
 * **Custom Source Compilation:** Mastered low-level build configurations by utilizing CMake to build and compile OpenCV and `opencv_contrib` from source, unlocking advanced GPU and hardware-optimization modules.
 * **Real-Time Signal Ingestion:** Acquired practical engineering experience interfacing with specialized medical hardware, successfully capturing, reading, and streaming live endoscopic video input.
 * **High-Performance Image Enhancement:** Deployed production-grade video processing pipelines optimized for real-time visualization and boundary/edge reinforcement.
-* **Modular Software Architecture:** Mastered the concepts of dynamic linking by building custom DLLs for cross-environment integration and explored cross-platform GUI application workflows using the Qt framework.
+* **Modular Software Architecture:** Mastered the concepts of dynamic linking by building custom DLLs for cross-environment integration and explored GUI application workflows.

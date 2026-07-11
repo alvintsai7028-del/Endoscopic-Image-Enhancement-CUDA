@@ -56,7 +56,7 @@ Endoscopic video streams present unique visualization challenges, including unev
 * **Discrete Wavelet Decomposition (DWT):** By breaking the image into multi-resolution sub-bands, the system isolates high-frequency structural details (such as tissue texturing and vascular boundaries) from low-frequency illumination shifts. This enables targeted enhancement of critical clinical features.
 * **Guided Filtering:** Unlike conventional bilateral filters that often cause gradient reversal artifacts (making biological tissues look unnaturally blocky), the Guided Filter leverages a structural guide to smoothly suppress noise while strictly preserving sharp, critical boundaries of blood vessels.
 * **Laplacian Filter:** Applied during the reconstruction stage to provide micro-edge sharpening. This enhances the visibility of fine capillary networks, making it easier to trace micro-vessel contours.
-* **Alpha-Beta Blending & Contrast Tuning:** Serving as a final clinical safety checkpoint, this stage blends the highly enhanced texture map back with the original frames. It allows operators to dynamically adjust parameters to their personal visual comfort, ensuring the visual output remains anatomically accurate and customizable for the clinician.
+* **Alpha-Beta Blending & Contrast Tuning:** This stage blends the highly enhanced texture map back with the original frames. It allows operators to dynamically adjust parameters to their personal visual comfort, ensuring the visual output remains anatomically accurate and customizable for the clinician.
 
 ## Multi-Mode Live Demo & Algorithmic Comparison
 

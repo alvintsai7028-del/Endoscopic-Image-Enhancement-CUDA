@@ -47,15 +47,41 @@ graph TD
     I --> J[Alpha-Beta Blending & Contrast Tuning]
     J --> K[Real-Time Video Display / MP4 Output]
 ```
+## Algorithmic Rationales & Clinical Significance
+
+Endoscopic video streams present unique visualization challenges, including uneven illumination from internal light sources, severe specular reflections (surface glare) on wet tissue, and low contrast within sub-surface vascular structures. The pipeline's specific algorithmic sequence is meticulously structured to address these clinical artifacts without introducing artificial distortion:
+
+* **Gaussian Pre-filtering:** Medical camera sensors inherently introduce high-frequency noise, especially in low-light cavities. Pre-filtering suppresses this noise early in the pipeline, preventing subsequent non-linear contrast enhancement stages from aggressively amplifying background artifacts.
+* **CLAHE (Contrast Limited Adaptive Histogram Equalization):** Standard global histogram equalization would over-saturate bright reflections (specularities) and completely wash out structural details. CLAHE limits contrast amplification locally, bringing out subtle mucosal patterns and lesions without causing blooming or loss of details.
+* **Discrete Wavelet Decomposition (DWT):** By breaking the image into multi-resolution sub-bands, the system isolates high-frequency structural details (such as tissue texturing and vascular boundaries) from low-frequency illumination shifts. This enables targeted enhancement of critical clinical features.
+* **Guided Filtering:** Unlike conventional bilateral filters that often cause gradient reversal artifacts (making biological tissues look unnaturally blocky), the Guided Filter leverages a structural guide to smoothly suppress noise while strictly preserving sharp, critical boundaries of blood vessels.
+* **Laplacian Filter:** Applied during the reconstruction stage to provide micro-edge sharpening. This enhances the visibility of fine capillary networks, making it easier to trace micro-vessel contours.
+* **Alpha-Beta Blending & Contrast Tuning:** Serving as a final clinical safety checkpoint, this stage blends the highly enhanced texture map back with the original frames. It allows operators to dynamically adjust parameters to their personal visual comfort, ensuring the visual output remains anatomically accurate and customizable for the clinician.
+
 ## Multi-Mode Live Demo & Algorithmic Comparison
 
-The enhancement engine features a dynamic runtime architecture supporting three modular visualization modes. This configuration acts as a progressive ablation study, demonstrating the performance variance between standard RGB-space transformation and dual-stage cross-color-space luminance alignment.
+The enhancement engine features a dynamic runtime architecture supporting three modular visualization modes. The benchmarks below represent three identical frame samples captured from a continuous, real-time enhanced endoscopic video stream. Rather than a linear upgrade, these modes offer **diagnostic flexibility**, allowing clinicians to interactively toggle between views based on their personal visual comfort and specific clinical focus.
 
 | Mode 0: Raw Clinical Input | Mode 1: RGB-Space CLAHE Engine | Mode 2: Dual-Stage Full Optimization |
 | :---: | :---: | :---: |
 | ![Mode 0 Raw](./mode0.jpg) | ![Mode 1 RGB CLAHE](./mode1.jpg) | ![Mode 2 Dual Stage](./mode2.jpg) |
 | **Baseline Stream** | **Multi-Channel RGB CLAHE Pipeline** | **HSV V-Channel + Multi-Channel RGB CLAHE Pipeline** |
-| Standard uncompressed camera acquisition with muted sub-surface vascular details and uneven lighting. | Applies multi-threaded CLAHE independently across R, G, and B channels alongside DWT edge-preservation. | Executes an initial pre-processing CLAHE pass on the HSV V-channel before computing multi-channel RGB loops. |
+| Standard camera acquisition with muted sub-surface vascular details and uneven lighting. | Applies multi-threaded CLAHE independently across R, G, and B channels alongside DWT edge-preservation. | Executes an initial pre-processing CLAHE pass on the HSV V-channel before computing multi-channel RGB loops. |
+| *Visual Characteristics:* Standard white-light illumination; high specular reflections (surface glare); deep capillaries remain soft and blurry. | *Visual Characteristics:* Noticeable amplification of capillary sharpness and localized contrast while maintaining a color spectrum relatively closer to white-light endoscopy. | *Visual Characteristics:* Aggressive accentuation of structural borders and micro-vessel topography, introducing a high-contrast hue that heavily isolates vascular networks. |
+
+---
+
+### Clinical Flexibility & Engineering Design Decisions
+
+Medical imaging demands personalizability; different procedures and different clinicians require distinct visual cues. The system provides an interactive control panel for seamless runtime switching between Mode 1 and Mode 2 to accommodate different diagnostic scenarios:
+
+* **Mode 1 (RGB-Space CLAHE): Balanced Full-Spectrum Visualization**
+  By applying enhancement directly within the RGB channels, this mode delivers a uniform boost to local textures and edges while trying to preserve the overall organic tone of the tissue. This is ideal for clinicians who prefer a enhanced view that still closely mimics standard white-light endoscopy, avoiding radical color shifts during general screening.
+
+* **Mode 2 (Dual-Stage HSV V-Channel + RGB): High-Contrast Structural Isolation**
+  By mapping the frames to the **HSV color space** first, we isolate the **Luminance/Value (V)** channel. Running a primary CLAHE pass on the V-channel normalizes global light distribution and diffuses blinding specular glares *before* entering the multi-channel RGB enhancement loops. 
+  
+  This dual-stage approach forces the algorithm to focus heavily on the structural boundaries of blood vessels and mucosal texturing. The resulting image heavily emphasizes micro-vessel contours (yielding the distinct, high-contrast definition seen in the final frame), making it highly effective for targeted examinations where tracing fine capillary patterns is the primary objective.
 
 ## Technical Implementation Details
 

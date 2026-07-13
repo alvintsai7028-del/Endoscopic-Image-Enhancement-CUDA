@@ -4,12 +4,12 @@
 > A high-performance endoscopic image enhancement pipeline optimized for real-time medical video processing using modern C++, NVIDIA CUDA, and multi-threaded concurrency.
 
 > **Note**
-> Due to intellectual property protections and non-disclosure agreements (NDA), the source code for this project cannot be publicly released. This repository documents the system architecture, implementation details, optimization strategies, and engineering contributions.
+> Due to intellectual property considerations, the source code for this project cannot be publicly released. This repository documents the system architecture, implementation details, optimization strategies, and engineering contributions.
 
 
 ## Overview
 
-This project was developed during my software engineering internship and focuses on transforming a high-latency Python prototype into a deployment-oriented C++ application capable of real-time endoscopic video enhancement.
+This project was developed during my software engineering internship at Industrial Technology Research Institute (ITRI) as part of an industry collaboration on real-time endoscopic image enhancement. It focused on transforming a high-latency Python prototype into a deployment-oriented C++ application capable of real-time endoscopic video enhancement.
 
 The original implementation processed a **1280×720** frame in approximately **3.52 seconds**, making live visualization impossible. Through algorithmic refactoring, custom mathematical implementations, GPU acceleration using NVIDIA CUDA, and multi-threaded concurrency, the processing latency was reduced to approximately **35 ms per frame**, achieving nearly **30 FPS** real-time performance.
 
@@ -22,11 +22,60 @@ Rather than focusing solely on algorithm implementation, this project emphasizes
 - Achieved over **100× speed improvement**
 - NVIDIA CUDA accelerated image processing
 - Multi-threaded pipeline using `std::thread`
-- Real-time processing for live endoscopic video streams
+- Live endoscopic video streaming with real-time enhancement
 - Implemented custom Discrete Wavelet Transform (DWT) and Guided Filter modules from scratch
 - Built a configurable GUI supporting runtime parameter adjustment
 - Generated DLL modules for deployment across multiple systems
 
+## Multi-Mode Visualization
+> **Note**
+> The following representative results were generated using self-recorded tongue images captured during system development for demonstration purposes
+
+The application supports multiple enhancement modes that can be switched dynamically during runtime.
+
+| Mode | Description |
+|-------|-------------|
+| Mode 0 | Original endoscopic video |
+| Mode 1 | RGB-space CLAHE enhancement |
+| Mode 2 | HSV V-channel preprocessing + RGB enhancement |
+
+Example comparison:
+
+| Original | Mode 1 | Mode 2 |
+|----------|---------|---------|
+| ![](mode0.jpg) | ![](mode1.jpg) | ![](mode2.jpg) |
+
+Mode 1 provides balanced contrast enhancement while preserving natural color appearance.
+
+Mode 2 applies an additional CLAHE pass on the HSV Value channel before RGB enhancement, further emphasizing local structural contrast and fine vascular patterns.
+
+## Performance Benchmark
+
+### Benchmark Environment
+
+| Item | Specification |
+|------|---------------|
+| Resolution | 1280 × 720 |
+| Language | C++ |
+| GPU | NVIDIA CUDA |
+| Framework | OpenCV |
+| Build System | CMake |
+| Compiler | Visual Studio |
+
+### Performance
+
+| Stage | Time / Frame | FPS |
+|---------|-------------|------|
+| Python Prototype | 3.52 s | 0.28 |
+| Initial C++ Version | 1.48 s | 0.68 |
+| CUDA + Multi-threading | 0.035 s | 28.6 |
+
+### Performance Improvement
+
+- **Latency reduced by over 99%**
+- **More than 100× speed improvement**
+- **Real-time visualization achieved**
+- **Stable processing at nearly 30 FPS**
 
 ## My Contributions
 
@@ -114,27 +163,6 @@ Enhances local edge responses to improve structural visibility.
 Blends enhanced textures with the original image, allowing dynamic adjustment between natural appearance and enhanced visualization.
 
 
-## Multi-Mode Visualization
-
-The application supports multiple enhancement modes that can be switched dynamically during runtime.
-
-| Mode | Description |
-|-------|-------------|
-| Mode 0 | Original endoscopic video |
-| Mode 1 | RGB-space CLAHE enhancement |
-| Mode 2 | HSV V-channel preprocessing + RGB enhancement |
-
-Example comparison:
-
-| Original | Mode 1 | Mode 2 |
-|----------|---------|---------|
-| ![](mode0.jpg) | ![](mode1.jpg) | ![](mode2.jpg) |
-
-Mode 1 provides balanced contrast enhancement while preserving natural color appearance.
-
-Mode 2 applies an additional CLAHE pass on the HSV Value channel before RGB enhancement, further emphasizing local structural contrast and fine vascular patterns.
-
-
 ## Technical Implementation
 
 ### Algorithmic Optimization
@@ -173,35 +201,6 @@ The application includes an interactive GUI supporting:
 - Dual-stream display
 
 All parameters can be adjusted during runtime without restarting the application.
-
-
-## Performance Benchmark
-
-### Benchmark Environment
-
-| Item | Specification |
-|------|---------------|
-| Resolution | 1280 × 720 |
-| Language | C++ |
-| GPU | NVIDIA CUDA |
-| Framework | OpenCV |
-| Build System | CMake |
-| Compiler | Visual Studio |
-
-### Performance
-
-| Stage | Time / Frame | FPS |
-|---------|-------------|------|
-| Python Prototype | 3.52 s | 0.28 |
-| Initial C++ Version | 1.48 s | 0.68 |
-| CUDA + Multi-threading | 0.035 s | 28.6 |
-
-### Performance Improvement
-
-- **Latency reduced by over 99%**
-- **More than 100× speed improvement**
-- **Real-time visualization achieved**
-- **Stable processing at nearly 30 FPS**
 
 
 ## Engineering Challenges
@@ -273,10 +272,10 @@ architecture.png
 
 ---
 
-## License
+## Acknowledgement
 
-The implementation described in this repository was completed during an industrial internship.
+This project was completed during my internship at ITRI.
 
-Source code is proprietary and cannot be publicly released due to intellectual property protection and non-disclosure agreements.
+Representative enhancement results shown in this repository use self-recorded tongue images for demonstration purposes.
 
-This repository is intended solely for documentation and portfolio purposes.
+The source code and proprietary implementation details cannot be publicly released due to intellectual property protection.

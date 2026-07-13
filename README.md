@@ -6,7 +6,6 @@
 > **Note**
 > Due to intellectual property protections and non-disclosure agreements (NDA), the source code for this project cannot be publicly released. This repository documents the system architecture, implementation details, optimization strategies, and engineering contributions.
 
----
 
 ## Overview
 
@@ -16,9 +15,8 @@ The original implementation processed a **1280×720** frame in approximately **3
 
 Rather than focusing solely on algorithm implementation, this project emphasizes **high-performance software engineering**, including system optimization, hardware acceleration, dependency management, modular software architecture, and real-time image processing.
 
----
 
-# Project Highlights
+## Project Highlights
 
 - Refactored a legacy Python prototype into modern C++
 - Achieved over **100× speed improvement**
@@ -29,9 +27,8 @@ Rather than focusing solely on algorithm implementation, this project emphasizes
 - Built a configurable GUI supporting runtime parameter adjustment
 - Generated DLL modules for deployment across multiple systems
 
----
 
-# My Contributions
+## My Contributions
 
 During this project, I was responsible for:
 
@@ -44,9 +41,8 @@ During this project, I was responsible for:
 - Configuring the OpenCV + CUDA + CMake development environment
 - Packaging the application as a Dynamic Link Library (DLL) for deployment
 
----
 
-# System Architecture
+## System Architecture
 
 ```mermaid
 graph TD
@@ -89,39 +85,36 @@ I-->J[Alpha-Beta Blending]
 J-->K[Real-Time Display]
 ```
 
----
-
-# Image Enhancement Pipeline
+## Image Enhancement Pipeline
 
 The enhancement pipeline consists of multiple complementary stages designed to improve visualization while preserving anatomical structures.
 
-## Gaussian Pre-filtering
+### Gaussian Pre-filtering
 
 Suppresses sensor noise before nonlinear enhancement to prevent amplification of high-frequency artifacts.
 
-## CLAHE
+### CLAHE
 
 Contrast Limited Adaptive Histogram Equalization improves local contrast while preventing over-enhancement caused by traditional histogram equalization.
 
-## Discrete Wavelet Transform (DWT)
+### Discrete Wavelet Transform (DWT)
 
 Separates illumination information from structural details, allowing different frequency components to be processed independently.
 
-## Guided Filter
+### Guided Filter
 
 Preserves fine image boundaries while smoothing noise, reducing halo artifacts commonly introduced by traditional edge-preserving filters.
 
-## Laplacian Sharpening
+### Laplacian Sharpening
 
 Enhances local edge responses to improve structural visibility.
 
-## Alpha-Beta Blending
+### Alpha-Beta Blending
 
 Blends enhanced textures with the original image, allowing dynamic adjustment between natural appearance and enhanced visualization.
 
----
 
-# Multi-Mode Visualization
+## Multi-Mode Visualization
 
 The application supports multiple enhancement modes that can be switched dynamically during runtime.
 
@@ -141,11 +134,10 @@ Mode 1 provides balanced contrast enhancement while preserving natural color app
 
 Mode 2 applies an additional CLAHE pass on the HSV Value channel before RGB enhancement, further emphasizing local structural contrast and fine vascular patterns.
 
----
 
-# Technical Implementation
+## Technical Implementation
 
-## Algorithmic Optimization
+### Algorithmic Optimization
 
 Because standard C++ libraries do not provide native implementations of several required image processing algorithms, multiple mathematical modules were implemented from scratch.
 
@@ -156,25 +148,20 @@ Implemented modules include:
 - Image reconstruction
 - Mathematical optimization routines
 
----
-
-## GPU Acceleration
+### GPU Acceleration
 
 GPU acceleration was implemented using NVIDIA CUDA.
 
 Computational bottlenecks—including repeated matrix operations and computationally intensive OpenCV routines—were migrated to CUDA kernels, significantly reducing execution latency.
 
----
 
-## Multi-Threaded Processing
+### Multi-Threaded Processing
 
 To maximize CPU utilization, image channels are processed concurrently using `std::thread`.
 
 Each thread coordinates GPU-accelerated processing for one color channel before synchronization and reconstruction.
 
----
-
-## GUI & Runtime Controls
+### GUI & Runtime Controls
 
 The application includes an interactive GUI supporting:
 
@@ -187,11 +174,10 @@ The application includes an interactive GUI supporting:
 
 All parameters can be adjusted during runtime without restarting the application.
 
----
 
-# Performance Benchmark
+## Performance Benchmark
 
-## Benchmark Environment
+### Benchmark Environment
 
 | Item | Specification |
 |------|---------------|
@@ -202,9 +188,7 @@ All parameters can be adjusted during runtime without restarting the application
 | Build System | CMake |
 | Compiler | Visual Studio |
 
----
-
-## Performance
+### Performance
 
 | Stage | Time / Frame | FPS |
 |---------|-------------|------|
@@ -219,31 +203,26 @@ All parameters can be adjusted during runtime without restarting the application
 - **Real-time visualization achieved**
 - **Stable processing at nearly 30 FPS**
 
----
 
-# Engineering Challenges
+## Engineering Challenges
 
-## Custom Mathematical Implementations
+### Custom Mathematical Implementations
 
 Several required algorithms were unavailable in standard C++ libraries.
 
 Core mathematical modules—including DWT and Guided Filtering—were implemented independently based on algorithmic principles and optimized for real-time execution.
 
----
 
-## CUDA Development Environment
+### CUDA Development Environment
 
 Built an OpenCV + CUDA + CMake development environment from scratch while resolving dependency and version compatibility issues across multiple development machines.
 
----
-
-## Cross-System Deployment
+### Cross-System Deployment
 
 Packaged the application as a Dynamic Link Library (DLL) and successfully deployed it across different hardware environments while maintaining OpenCV version compatibility.
 
----
 
-# Key Learnings
+## Key Learnings
 
 Throughout this project I gained practical experience in:
 
@@ -257,9 +236,8 @@ Throughout this project I gained practical experience in:
 - Real-time video processing
 - Engineering optimization for production-scale systems
 
----
 
-# Limitations
+## Limitations
 
 This repository summarizes the engineering implementation of the project rather than providing source code.
 
@@ -267,9 +245,7 @@ Current evaluation focuses primarily on computational performance and visualizat
 
 No clinical validation or diagnostic claims are made, and further evaluation on diverse datasets would be required for medical deployment.
 
----
-
-# Technologies
+## Technologies
 
 - C++
 - CUDA
@@ -284,9 +260,8 @@ No clinical validation or diagnostic claims are made, and further evaluation on 
 - Image Processing
 - Medical Imaging
 
----
 
-# Repository Structure
+## Repository Structure
 
 ```
 README.md
@@ -298,7 +273,7 @@ architecture.png
 
 ---
 
-# License
+## License
 
 The implementation described in this repository was completed during an industrial internship.
 

@@ -1,134 +1,307 @@
-# Real-Time Endoscopic Image Enhancement System via CUDA & Multi-Threaded C++
+# Real-Time Endoscopic Image Enhancement System
+### CUDA-Accelerated & Multi-Threaded C++ Medical Imaging Pipeline
 
-## Project Overview
-This repository details the architecture, optimization strategies, and performance benchmarks of a high-performance medical video processing pipeline designed for real-time endoscopic procedures. The core objective was to refactor a legacy, high-latency Python prototype into a production-ready C++ application capable of processing high-resolution video streams with zero perceptible lag.
+> A high-performance endoscopic image enhancement pipeline optimized for real-time medical video processing using modern C++, NVIDIA CUDA, and multi-threaded concurrency.
 
-By implementing custom mathematical algorithms, utilizing hardware acceleration via NVIDIA CUDA, and executing multi-threaded concurrency, the system's processing speed was accelerated significantly, achieving real-time performance of nearly 30 FPS for 1280x720 video streams.
-
-***Due to intellectual property protections and non-disclosure agreements, the source code for this project is proprietary and cannot be shared publicly. This document serves as a comprehensive architectural and engineering summary of the implementation.***
+> **Note**
+> Due to intellectual property protections and non-disclosure agreements (NDA), the source code for this project cannot be publicly released. This repository documents the system architecture, implementation details, optimization strategies, and engineering contributions.
 
 ---
 
-## System Architecture & Pipeline Flowchart
+## Overview
 
-The system ingests sequential video frames from an endoscopic camera device. To achieve maximum processing efficiency, the framework splits individual color channels and handles computationally intensive operations across parallel CPU threads and GPU kernels.
+This project was developed during my software engineering internship and focuses on transforming a high-latency Python prototype into a deployment-oriented C++ application capable of real-time endoscopic video enhancement.
+
+The original implementation processed a **1280×720** frame in approximately **3.52 seconds**, making live visualization impossible. Through algorithmic refactoring, custom mathematical implementations, GPU acceleration using NVIDIA CUDA, and multi-threaded concurrency, the processing latency was reduced to approximately **35 ms per frame**, achieving nearly **30 FPS** real-time performance.
+
+Rather than focusing solely on algorithm implementation, this project emphasizes **high-performance software engineering**, including system optimization, hardware acceleration, dependency management, modular software architecture, and real-time image processing.
+
+---
+
+# Project Highlights
+
+- Refactored a legacy Python prototype into modern C++
+- Achieved over **100× speed improvement**
+- NVIDIA CUDA accelerated image processing
+- Multi-threaded pipeline using `std::thread`
+- Real-time processing for live endoscopic video streams
+- Implemented custom Discrete Wavelet Transform (DWT) and Guided Filter modules from scratch
+- Built a configurable GUI supporting runtime parameter adjustment
+- Generated DLL modules for deployment across multiple systems
+
+---
+
+# My Contributions
+
+During this project, I was responsible for:
+
+- Rewriting the original Python image processing pipeline in modern C++
+- Implementing custom mathematical modules including Discrete Wavelet Transform (DWT) and Guided Filtering
+- Accelerating computational bottlenecks using NVIDIA CUDA
+- Designing a multi-threaded image processing framework with `std::thread`
+- Building an interactive GUI for real-time parameter tuning
+- Optimizing the complete pipeline from **0.28 FPS** to nearly **30 FPS**
+- Configuring the OpenCV + CUDA + CMake development environment
+- Packaging the application as a Dynamic Link Library (DLL) for deployment
+
+---
+
+# System Architecture
 
 ```mermaid
 graph TD
-    A[Endoscopic Camera Capture] --> B[Gaussian Pre-filtering GPU]
-    B --> C[Split into R, G, B Channels]
-    
-    subgraph Parallel Channel Processing Multi-Threading
-        C -->|Thread 1| D1[R Channel CLAHE GPU]
-        C -->|Thread 2| D2[G Channel CLAHE GPU]
-        C -->|Thread 3| D3[B Channel CLAHE GPU]
-        
-        D1 --> E1[Discrete Wavelet Decomposition CPU]
-        D2 --> E2[Discrete Wavelet Decomposition CPU]
-        D3 --> E3[Discrete Wavelet Decomposition CPU]
-        
-        E1 --> F1[Guided Filtering CUDA Kernel]
-        E2 --> F2[Guided Filtering CUDA Kernel]
-        E3 --> F3[Guided Filtering CUDA Kernel]
-        
-        F1 --> G1[Channel Reconstruction CPU]
-        F2 --> G2[Channel Reconstruction CPU]
-        F3 --> G3[Channel Reconstruction CPU]
-        
-        G1 --> H1[Laplacian Filter GPU]
-        G2 --> H2[Laplacian Filter GPU]
-        G3 --> H3[Laplacian Filter GPU]
-    end
-    
-    H1 --> I[Merge Channels]
-    H2 --> I
-    H3 --> I
-    
-    I --> J[Alpha-Beta Blending & Contrast Tuning]
-    J --> K[Real-Time Video Display / MP4 Output]
+
+A[Endoscopic Camera]
+-->B[Gaussian Pre-filtering]
+
+B-->C[Split RGB Channels]
+
+subgraph Parallel Processing
+
+C-->D1[R Channel]
+C-->D2[G Channel]
+C-->D3[B Channel]
+
+D1-->E1[CLAHE]
+D2-->E2[CLAHE]
+D3-->E3[CLAHE]
+
+E1-->F1[DWT]
+E2-->F2[DWT]
+E3-->F3[DWT]
+
+F1-->G1[Guided Filter CUDA]
+F2-->G2[Guided Filter CUDA]
+F3-->G3[Guided Filter CUDA]
+
+G1-->H1[Laplacian]
+G2-->H2[Laplacian]
+G3-->H3[Laplacian]
+
+end
+
+H1-->I[Merge Channels]
+H2-->I
+H3-->I
+
+I-->J[Alpha-Beta Blending]
+
+J-->K[Real-Time Display]
 ```
-## Algorithmic Rationales & Clinical Significance
-
-Endoscopic video streams present unique visualization challenges, including uneven illumination from internal light sources, severe specular reflections (surface glare) on wet tissue, and low contrast within sub-surface vascular structures. The pipeline's specific algorithmic sequence is meticulously structured to address these clinical artifacts without introducing artificial distortion:
-
-* **Gaussian Pre-filtering:** Medical camera sensors inherently introduce high-frequency noise, especially in low-light cavities. Pre-filtering suppresses this noise early in the pipeline, preventing subsequent non-linear contrast enhancement stages from aggressively amplifying background artifacts.
-* **CLAHE (Contrast Limited Adaptive Histogram Equalization):** Standard global histogram equalization would over-saturate bright reflections (specularities) and completely wash out structural details. CLAHE limits contrast amplification locally, bringing out subtle mucosal patterns and lesions without causing blooming or loss of details.
-* **Discrete Wavelet Decomposition (DWT):** By breaking the image into multi-resolution sub-bands, the system isolates high-frequency structural details (such as tissue texturing and vascular boundaries) from low-frequency illumination shifts. This enables targeted enhancement of critical clinical features.
-* **Guided Filtering:** Unlike conventional bilateral filters that often cause gradient reversal artifacts (making biological tissues look unnaturally blocky), the Guided Filter leverages a structural guide to smoothly suppress noise while strictly preserving sharp, critical boundaries of blood vessels.
-* **Laplacian Filter:** Applied during the reconstruction stage to provide micro-edge sharpening. This enhances the visibility of fine capillary networks, making it easier to trace micro-vessel contours.
-* **Alpha-Beta Blending & Contrast Tuning:** This stage blends the highly enhanced texture map back with the original frames. It allows operators to dynamically adjust parameters to their personal visual comfort, ensuring the visual output remains anatomically accurate and customizable for the clinician.
-
-## Multi-Mode Live Demo & Algorithmic Comparison
-
-The enhancement engine features a dynamic runtime architecture supporting three modular visualization modes. The benchmarks below represent three identical frame samples captured from a continuous, real-time enhanced endoscopic video stream. Rather than a linear upgrade, these modes offer **diagnostic flexibility**, allowing clinicians to interactively toggle between views based on their personal visual comfort and specific clinical focus.
-
-| Mode 0: Raw Clinical Input | Mode 1: RGB-Space CLAHE Engine | Mode 2: Dual-Stage Full Optimization |
-| :---: | :---: | :---: |
-| ![Mode 0 Raw](./mode0.jpg) | ![Mode 1 RGB CLAHE](./mode1.jpg) | ![Mode 2 Dual Stage](./mode2.jpg) |
-| **Baseline Stream** | **Multi-Channel RGB CLAHE Pipeline** | **HSV V-Channel + Multi-Channel RGB CLAHE Pipeline** |
-| Standard camera acquisition with muted sub-surface vascular details and uneven lighting. | Applies multi-threaded CLAHE independently across R, G, and B channels alongside DWT edge-preservation. | Executes an initial pre-processing CLAHE pass on the HSV V-channel before computing multi-channel RGB loops. |
-| *Visual Characteristics:* Standard white-light illumination; high specular reflections (surface glare); deep capillaries remain soft and blurry. | *Visual Characteristics:* Noticeable amplification of capillary sharpness and localized contrast while maintaining a color spectrum relatively closer to white-light endoscopy. | *Visual Characteristics:* Aggressive accentuation of structural borders and micro-vessel topography, introducing a high-contrast hue that heavily isolates vascular networks. |
 
 ---
 
-### Clinical Flexibility & Engineering Design Decisions
+# Image Enhancement Pipeline
 
-Medical imaging demands personalizability; different procedures and different clinicians require distinct visual cues. The system provides an interactive control panel for seamless runtime switching between Mode 1 and Mode 2 to accommodate different diagnostic scenarios:
+The enhancement pipeline consists of multiple complementary stages designed to improve visualization while preserving anatomical structures.
 
-* **Mode 1 (RGB-Space CLAHE): Balanced Full-Spectrum Visualization**
-  By applying enhancement directly within the RGB channels, this mode delivers a uniform boost to local textures and edges while trying to preserve the overall organic tone of the tissue. This is ideal for clinicians who prefer a enhanced view that still closely mimics standard white-light endoscopy, avoiding radical color shifts during general screening.
+## Gaussian Pre-filtering
 
-* **Mode 2 (Dual-Stage HSV V-Channel + RGB): High-Contrast Structural Isolation**
-  By mapping the frames to the **HSV color space** first, we isolate the **Luminance/Value (V)** channel. Running a primary CLAHE pass on the V-channel normalizes global light distribution and diffuses blinding specular glares *before* entering the multi-channel RGB enhancement loops. 
-  
-  This dual-stage approach forces the algorithm to focus heavily on the structural boundaries of blood vessels and mucosal texturing. The resulting image heavily emphasizes micro-vessel contours (yielding the distinct, high-contrast definition seen in the final frame), making it highly effective for targeted examinations where tracing fine capillary patterns is the primary objective.
+Suppresses sensor noise before nonlinear enhancement to prevent amplification of high-frequency artifacts.
 
-## Technical Implementation Details
+## CLAHE
 
-### 1. Algorithmic Refactoring & Mathematical Optimization
-* **Hand-Crafted Mathematical Modules:** Because standard C++ libraries lack native support for Discrete Wavelet Transforms (DWT) and Guided Filtering, these components were engineered entirely from scratch.
-* **Function-Level Acceleration:** The core algorithm's internal execution path was optimized using mathematical logic and structural consolidation to minimize computational redundancy and reduce per-frame execution time.
+Contrast Limited Adaptive Histogram Equalization improves local contrast while preventing over-enhancement caused by traditional histogram equalization.
 
-### 2. Hardware Acceleration via NVIDIA CUDA
-* **Environment Architecture:** Configured a high-performance development environment from the ground up using Visual Studio, CMake, OpenCV (including `opencv_contrib`), and the NVIDIA CUDA toolkit.
-* **GPU-Accelerated Matrix Operations:** Offloaded heavily repeated operations—specifically matrix computations within the Guided Filter and native OpenCV functions—directly onto GPU kernels to bypass sequential CPU execution bottlenecks.
+## Discrete Wavelet Transform (DWT)
 
-### 3. Multi-Threaded Concurrency
-* **Parallel Channel Processing:** Because sequential processing of individual image channels using standard loops was highly inefficient, the pipeline splits the frame into three discrete channels and processes them simultaneously.
-* **Threaded Acceleration:** Utilizing `std::thread`, three concurrent CPU threads execute image enhancement tasks in parallel, maximizing multi-core processor efficiency and enabling high-throughput streaming.
+Separates illumination information from structural details, allowing different frequency components to be processed independently.
 
-### 4. Dynamic Parameter Control & User Interface
-* **Interactive Control Panel:** Interactive Control Panel: Designed an enhanced real-time application featuring an integrated graphical user interface (GUI) with sliders, enabling operators to dynamically adjust algorithm parameters in real time.
-* **Configurable Optimization Pipelines:** Users can interactively tune parameters such as thresholding limits, filter kernels, and visualization modes (e.g., side-by-side comparison or dual-lens stream views).
-* **V-Channel Contrast Enhancement:** Integrated an optional pipeline expansion that applies Contrast Limited Adaptive Histogram Equalization (CLAHE) specifically to the V (Value) channel within the HSV color space for enhanced detail visualization.
+## Guided Filter
 
-## Quantitative Performance Indicators
+Preserves fine image boundaries while smoothing noise, reducing halo artifacts commonly introduced by traditional edge-preserving filters.
 
-Through structural algorithmic refactoring, hardware acceleration, and concurrency tuning, the system achieved a massive reduction in frame processing latency, successfully enabling smooth, real-time visualization.
+## Laplacian Sharpening
 
-| Optimization Phase | Execution Time Per Frame (1280x720) | Equivalent Frame Rate (FPS) | Performance Gain |
-| :--- | :--- | :--- | :--- |
-| **Python Prototype (Baseline)** | 3.52 seconds | ~0.28 FPS | Baseline |
-| **Naive C++ Port (Logic Tweaks)** | 1.48 seconds | ~0.68 FPS | 2.38x Acceleration |
-| **CUDA + Multi-Threaded C++** | 0.035 seconds | ~28.6 FPS | **100.57x Acceleration** |
+Enhances local edge responses to improve structural visibility.
 
-### Core Benchmarks & Key Metrics
-* **Latency Reduction:** Frame processing time for a standard 1280x720 resolution stream dropped from 3.52 seconds to 1.48 seconds after basic C++ logic modifications, and was ultimately minimized to 0.035 seconds through advanced acceleration.
-* **Real-Time Throughput:** By shifting critical matrix computations to the GPU and implementing multi-threaded processing while omitting non-essential Super-Resolution overhead, the pipeline maintains a consistent throughput of nearly 30 FPS.
-* **Dynamic Resolution Scalability:** The framework delivers lag-free, real-time processing across various endoscopic instruments by dynamically adjusting the pre-processing magnification scale based on the target camera's input resolution.
+## Alpha-Beta Blending
 
-## Engineering Challenges & Key Learnings
+Blends enhanced textures with the original image, allowing dynamic adjustment between natural appearance and enhanced visualization.
 
-### Technical Challenges & Bottleneck Resolution
+---
 
-* **Low-Level Algorithmic Reconstruction:** While the initial prototype relied heavily on high-level Python built-in functions, standard C++ libraries lacked native modules for Discrete Wavelet Transforms (DWT) and Guided Filtering. I engineered these core mathematical functions entirely from scratch, overcoming the obstacle of sparse online reference documentation.
-* **Complex Dependency & Version Compatibility:** Establishing the high-performance development ecosystem presented significant configuration challenges. I successfully built a unified runtime pipeline integrating Visual Studio, OpenCV, and the NVIDIA CUDA toolkit from the ground up, resolving complex version compatibility conflicts and overcoming environment disparities between desktop and laptop hardware that caused standard tutorials to fail.
-* **Cross-Platform Dynamic Library Deployment:** To prepare the product for commercial vendor delivery, the framework had to be compiled on a desktop workstation as a Dynamic Link Library (DLL) and successfully deployed on a target testing laptop. This required managing strict environment synchronization and OpenCV version parity across devices to prevent critical linking failures during execution.
+# Multi-Mode Visualization
 
-### Key Learnings & Skill Acquisition
+The application supports multiple enhancement modes that can be switched dynamically during runtime.
 
-* **Hardware Acceleration & Concurrency:** Gained hands-on expertise in GPU-accelerated computing via CUDA kernels and multi-threaded parallel processing using `std::thread` to maximize hardware processing throughput.
-* **Custom Source Compilation:** Mastered low-level build configurations by utilizing CMake to build and compile OpenCV and `opencv_contrib` from source, unlocking advanced GPU and hardware-optimization modules.
-* **Real-Time Signal Ingestion:** Acquired practical engineering experience interfacing with specialized medical hardware, successfully capturing, reading, and streaming live endoscopic video input.
-* **High-Performance Image Enhancement:** Deployed production-grade video processing pipelines optimized for real-time visualization and boundary/edge reinforcement.
-* **Modular Software Architecture:** Mastered the concepts of dynamic linking by building custom DLLs for cross-environment integration and explored GUI application workflows.
+| Mode | Description |
+|-------|-------------|
+| Mode 0 | Original endoscopic video |
+| Mode 1 | RGB-space CLAHE enhancement |
+| Mode 2 | HSV V-channel preprocessing + RGB enhancement |
+
+Example comparison:
+
+| Original | Mode 1 | Mode 2 |
+|----------|---------|---------|
+| ![](mode0.jpg) | ![](mode1.jpg) | ![](mode2.jpg) |
+
+Mode 1 provides balanced contrast enhancement while preserving natural color appearance.
+
+Mode 2 applies an additional CLAHE pass on the HSV Value channel before RGB enhancement, further emphasizing local structural contrast and fine vascular patterns.
+
+---
+
+# Technical Implementation
+
+## Algorithmic Optimization
+
+Because standard C++ libraries do not provide native implementations of several required image processing algorithms, multiple mathematical modules were implemented from scratch.
+
+Implemented modules include:
+
+- Discrete Wavelet Transform (DWT)
+- Guided Filter
+- Image reconstruction
+- Mathematical optimization routines
+
+---
+
+## GPU Acceleration
+
+GPU acceleration was implemented using NVIDIA CUDA.
+
+Computational bottlenecks—including repeated matrix operations and computationally intensive OpenCV routines—were migrated to CUDA kernels, significantly reducing execution latency.
+
+---
+
+## Multi-Threaded Processing
+
+To maximize CPU utilization, image channels are processed concurrently using `std::thread`.
+
+Each thread coordinates GPU-accelerated processing for one color channel before synchronization and reconstruction.
+
+---
+
+## GUI & Runtime Controls
+
+The application includes an interactive GUI supporting:
+
+- CLAHE parameters
+- Filter kernel sizes
+- Enhancement strength
+- Visualization mode selection
+- Side-by-side comparison
+- Dual-stream display
+
+All parameters can be adjusted during runtime without restarting the application.
+
+---
+
+# Performance Benchmark
+
+## Benchmark Environment
+
+| Item | Specification |
+|------|---------------|
+| Resolution | 1280 × 720 |
+| Language | C++ |
+| GPU | NVIDIA CUDA |
+| Framework | OpenCV |
+| Build System | CMake |
+| Compiler | Visual Studio |
+
+---
+
+## Performance
+
+| Stage | Time / Frame | FPS |
+|---------|-------------|------|
+| Python Prototype | 3.52 s | 0.28 |
+| Initial C++ Version | 1.48 s | 0.68 |
+| CUDA + Multi-threading | 0.035 s | 28.6 |
+
+### Performance Improvement
+
+- **Latency reduced by over 99%**
+- **More than 100× speed improvement**
+- **Real-time visualization achieved**
+- **Stable processing at nearly 30 FPS**
+
+---
+
+# Engineering Challenges
+
+## Custom Mathematical Implementations
+
+Several required algorithms were unavailable in standard C++ libraries.
+
+Core mathematical modules—including DWT and Guided Filtering—were implemented independently based on algorithmic principles and optimized for real-time execution.
+
+---
+
+## CUDA Development Environment
+
+Built an OpenCV + CUDA + CMake development environment from scratch while resolving dependency and version compatibility issues across multiple development machines.
+
+---
+
+## Cross-System Deployment
+
+Packaged the application as a Dynamic Link Library (DLL) and successfully deployed it across different hardware environments while maintaining OpenCV version compatibility.
+
+---
+
+# Key Learnings
+
+Throughout this project I gained practical experience in:
+
+- High-performance C++ programming
+- GPU computing with NVIDIA CUDA
+- Multi-threaded software architecture
+- Medical image enhancement
+- OpenCV source compilation
+- CMake project configuration
+- DLL deployment
+- Real-time video processing
+- Engineering optimization for production-scale systems
+
+---
+
+# Limitations
+
+This repository summarizes the engineering implementation of the project rather than providing source code.
+
+Current evaluation focuses primarily on computational performance and visualization quality.
+
+No clinical validation or diagnostic claims are made, and further evaluation on diverse datasets would be required for medical deployment.
+
+---
+
+# Technologies
+
+- C++
+- CUDA
+- OpenCV
+- OpenCV Contrib
+- CMake
+- Visual Studio
+- Multi-threading (`std::thread`)
+- DWT
+- Guided Filter
+- CLAHE
+- Image Processing
+- Medical Imaging
+
+---
+
+# Repository Structure
+
+```
+README.md
+mode0.jpg
+mode1.jpg
+mode2.jpg
+architecture.png
+```
+
+---
+
+# License
+
+The implementation described in this repository was completed during an industrial internship.
+
+Source code is proprietary and cannot be publicly released due to intellectual property protection and non-disclosure agreements.
+
+This repository is intended solely for documentation and portfolio purposes.
